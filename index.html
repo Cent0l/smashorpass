@@ -6,7 +6,7 @@
   <title>Smash or Pass – demo</title>
   <style>
     :root {
-      --bg: #0b0d12; --card:#151923; --muted:#9aa3b2; --text:#e8eefc; --accent:#6aa6ff; --bad:#f87171; --good:#34d399;
+      --bg: #0b0d12; --card:#151923; --muted:#9aa3b2; --text:#e8eefc; --accent:#6aa6ff;
     }
     *{box-sizing:border-box}
     html,body{min-height:100%}
@@ -15,12 +15,14 @@
     h1{font-size:20px;margin:0;letter-spacing:.4px}
     .wrap{max-width:960px;margin:0 auto;padding:16px}
     .arena{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .card{background:var(--card);border:1px solid #263042;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;min-height:420px;box-shadow:0 6px 30px rgba(0,0,0,.3)}
+    .card{background:var(--card);border:1px solid #263042;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;min-height:420px;box-shadow:0 6px 30px rgba(0,0,0,.3);transition:opacity 0.6s ease, transform 0.6s ease;}
+    .card.fade-out{opacity:0;transform:scale(0.9);}
+    .card.stay{opacity:1;transform:scale(1.05);border-color:var(--accent);}
     .media{position:relative;aspect-ratio:1/1;display:grid;place-items:center;background:#0c1018}
     .media img{width:100%;height:100%;object-fit:cover;display:block}
     .label{padding:12px 14px;border-top:1px solid #263042;display:flex;align-items:center;gap:8px}
     .label b{font-size:15px}
-    button.pick{margin:12px 14px 16px;padding:12px 14px;border-radius:12px;border:1px solid #2a3a55;background:#152036;color:var(--text);cursor:pointer;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+    button.pick{margin:12px 14px 16px;padding:12px 14px;border-radius:12px;border:1px solid #2a3a55;background:#152036;color:var(--text);cursor:pointer;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;transition:background 0.2s ease}
     button.pick:hover{filter:brightness(1.1)}
     .progress{margin:18px auto 8px;max-width:960px;height:8px;background:#121827;border:1px solid #263042;border-radius:999px;overflow:hidden}
     .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#9b7bff)}
@@ -139,18 +141,26 @@
       btn.addEventListener('click', ()=> choose(side));
 
       card.append(media,label,btn);
-      card.addEventListener('click', (e)=>{ if(e.target.tagName.toLowerCase()!=='button') choose(side); });
       return card;
     }
 
     function choose(side){
+      const cards = document.querySelectorAll('.card');
       const pair = state.pairs[state.i];
       const pick = side==='left' ? pair.left : pair.right;
       const reject = side==='left' ? pair.right : pair.left;
-      state.chosen.push(pick);
-      state.rejected.push(reject);
-      state.i++;
-      renderPair();
+      const chosenCard = side==='left' ? cards[0] : cards[1];
+      const rejectedCard = side==='left' ? cards[1] : cards[0];
+
+      chosenCard.classList.add('stay');
+      rejectedCard.classList.add('fade-out');
+
+      setTimeout(()=>{
+        state.chosen.push(pick);
+        state.rejected.push(reject);
+        state.i++;
+        renderPair();
+      },2000);
     }
 
     function renderGrid(items){
