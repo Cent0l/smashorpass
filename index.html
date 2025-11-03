@@ -35,7 +35,6 @@
     .pick { position:absolute; inset:auto 12px 12px 12px; display:flex; gap:10px; justify-content:space-between; }
     .pick button { flex:1; padding:12px 14px; border-radius:12px; }
     .yes { background: linear-gradient(180deg, #9bdb6b, #7dc14c); color:#0a1507; border-color:#6fb13f; }
-    .no { background: linear-gradient(180deg, #ff6b6b, #e45b5b); color:#220707; border-color:#c84a4a; }
     .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#0a0e1f; border:1px solid var(--border); padding:2px 6px; border-radius:6px; font-size:12px; color:#c4cbda; }
     .hidden { display:none !important; }
     .summary { margin-top:26px; display:grid; grid-template-columns:1fr; gap:24px; }
@@ -54,7 +53,7 @@
     <header>
       <div>
         <h1>Smash or Pass – This or That</h1>
-        <div class="muted">Pary i obrazy z pliku <code>data/pairs.json</code>. Klawiatura: <span class="kbd">←</span> / <span class="kbd">→</span>.</div>
+        <div class="muted">Pary i obrazy z pliku <code>data/pairs.json</code>. Klawiatura: <span class="kbd">←</span> / <span class="kbd">→</span>. Jeśli otwierasz <code>index.html</code> z dysku (file://), przeglądarka może blokować wczytanie JSON – wtedy użyj lokalnego serwera lub wstaw JSON w tagu „inline” na dole.</div>
       </div>
       <div class="toolbar">
         <button id="btn-restart">Zagraj od nowa</button>
@@ -78,31 +77,29 @@
         <div class="pick">
           <button class="yes" id="right-yes" aria-label="Wybierz prawą opcję">Wybieram</button>
         </div>
-      </article>yle="margin:0 0 6px;">Twoje wybory</h2>
+      </article>
+    </section>
+
+    <section id="summary" class="summary hidden">
+      <div>
+        <h2 style="margin:0 0 6px;">Twoje wybory</h2>
         <div class="grid" id="chosen-grid"></div>
       </div>
       <div>
         <h2 style="margin:0 0 6px;">Odrzucone</h2>
         <div class="grid" id="rejected-grid"></div>
       </div>
-      <div class="note muted">Plik <strong>data/pairs.json</strong> zawiera wszystkie rundy w kolejności. Każda runda to dokładnie zdefiniowana para: <em>left</em> ↔ <em>right</em>.
-      </div>
+      <div class="note muted">Plik <strong>data/pairs.json</strong> zawiera wszystkie rundy w kolejności. Każda runda to dokładnie zdefiniowana para: <em>left</em> ↔ <em>right</em>.</div>
     </section>
 
     <footer>Made for Mateusz • Frontend only • JSON jako źródło danych.</footer>
   </div>
 
+  <!-- Fallback do testów lokalnych (gdy file:// blokuje fetch). Wklej tutaj swój JSON lub zostaw pusty obiekt.
+       Używany TYLKO, gdy fetch('data/pairs.json') się nie powiedzie. -->
+  <script id="pairs-inline" type="application/json">{"pairs":[]}</script>
+
 <script>
-/********************
- * Struktura danych: data/pairs.json (pary ustalone z góry)
- * {
- *   "pairs": [
- *     { "left": {"id":"1","title":"Mazda MX-5 Miata","img":"img/1.png"},
- *       "right": {"id":"2","title":"Optimus Prime (Transformers)","img":"img/2.png"} },
- *     ...
- *   ]
- * }
- ********************/
 const $ = (sel) => document.querySelector(sel);
 
 const state = {
@@ -117,11 +114,25 @@ function preloadImages(pairs){
 }
 
 async function loadPairs(){
-  const res = await fetch('data/pairs.json', { cache: 'no-store' });
-  if(!res.ok) throw new Error('Nie udało się pobrać data/pairs.json ('+res.status+')');
-  const data = await res.json();
-  if(!data || !Array.isArray(data.pairs)) throw new Error('Zła struktura data/pairs.json (brak par).');
-  return data.pairs;
+  // próba pobrania z pliku
+  try {
+    const res = await fetch('data/pairs.json', { cache: 'no-store' });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    if(!data || !Array.isArray(data.pairs)) throw new Error('Zła struktura data/pairs.json (brak par).');
+    return data.pairs;
+  } catch(err){
+    // fallback: inline JSON (na potrzeby uruchamiania z file://)
+    try {
+      const raw = document.getElementById('pairs-inline')?.textContent || '{}';
+      const data = JSON.parse(raw);
+      if(Array.isArray(data.pairs)){
+        console.warn('Używam wbudowanego JSON (pairs-inline). Powód błędu fetch:', err.message);
+        return data.pairs;
+      }
+    } catch(_){}
+    throw err;
+  }
 }
 
 function updateProgress(){
@@ -136,9 +147,8 @@ function renderRound(){
   const { left, right } = state.pairs[state.round];
   $('#left-img').src = left.img;  $('#left-img').alt = left.title || left.id;  $('#left-cap').textContent = left.title || left.id;
   $('#right-img').src = right.img; $('#right-img').alt = right.title || right.id; $('#right-cap').textContent = right.title || right.id;
-  // jeden przycisk „Wybieram” na każdej karcie
-  $('#left-yes').onclick = ()=> pick(left, right);
-  $('#right-yes').onclick= ()=> pick(right, left);
+  $('#left-yes').onclick  = ()=> pick(left, right);
+  $('#right-yes').onclick = ()=> pick(right, left);
 }
 
 function pick(winObj, loseObj){
@@ -182,7 +192,6 @@ function exportResults(){
 $('#btn-restart').addEventListener('click', ()=> start());
 $('#btn-export').addEventListener('click', exportResults);
 
-// Klawiatura: ← wybiera lewą, → wybiera prawą
 window.addEventListener('keydown', (e)=>{
   if($('#game').classList.contains('hidden')) return;
   if(e.key === 'ArrowLeft'){ $('#left-yes').click(); }
@@ -194,7 +203,10 @@ async function start(){
   $('#summary').classList.add('hidden');
   $('#game').classList.remove('hidden');
   try { state.pairs = await loadPairs(); }
-  catch(err){ console.error(err); alert('Błąd: '+ err.message + '\nSprawdź plik data/pairs.json.'); state.pairs = []; }
+  catch(err){
+    alert('Nie wczytałem data/pairs.json. Jeśli uruchamiasz plik z dysku, przeglądarka blokuje fetch.\nUruchom lokalny serwer (np. VS Code: Live Server) albo wklej JSON w tagu #pairs-inline.\nSzczegóły: '+err.message);
+    state.pairs = [];
+  }
   preloadImages(state.pairs);
   renderRound();
 }
