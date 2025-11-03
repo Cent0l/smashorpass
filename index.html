@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smash or Pass – This or That</title>
+  <meta name="description" content="Gra This or That: pary i obrazy definiowane w pliku JSON. Wybierz jedną z dwóch opcji, na końcu zobacz podsumowanie wybranych i odrzuconych." />
+  <style>
+    :root {
+      --bg: #0f1221; --panel: #171a2b; --muted: #9aa3b2; --text: #e8ecf2;
+      --accent: #6ea8fe; --accent-2: #9bdb6b; --danger: #ff6b6b; --card: #1f2440; --border: #2e345a;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif; background: radial-gradient(1200px 600px at 70% -10%, #22284a 0%, var(--bg) 55%); color: var(--text); }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; }
+    h1 { font-size:24px; margin:0; letter-spacing:.3px; }
+    .muted { color:var(--muted); font-size:14px; }
+    .toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    button { background: var(--panel); color: var(--text); border:1px solid var(--border); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600; letter-spacing:.2px; }
+    button:hover { filter: brightness(1.06); }
+    .btn-primary { background: linear-gradient(180deg, #6ea8fe, #5b90e6); border-color:#4c7ad0; color:#0b1630; }
+    .progress { width:100%; height:10px; background:#0d1122; border:1px solid var(--border); border-radius:999px; overflow:hidden; }
+    .bar { height:100%; width:0%; background: linear-gradient(90deg, #6ea8fe, #9bdb6b); transition: width .25s ease; }
+
+    .stage { display:grid; grid-template-columns: 1fr 1fr; gap:18px; margin-top:18px; }
+    @media (max-width:860px){ .stage { grid-template-columns:1fr; } }
+
+    .card { position:relative; overflow:hidden; background:var(--card); border:1px solid var(--border); border-radius:16px; box-shadow:0 10px 24px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.02); display:flex; flex-direction:column; transition: transform .12s ease, box-shadow .12s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow:0 14px 30px rgba(0,0,0,.32); }
+    .media { aspect-ratio: 4/3; width:100%; background:#10142a; display:grid; place-items:center; overflow:hidden; }
+    .media img { width:100%; height:100%; object-fit:cover; display:block; }
+    .caption { padding:12px 14px; font-weight:700; border-top:1px solid var(--border); }
+    .pick { position:absolute; inset:auto 12px 12px 12px; display:flex; gap:10px; justify-content:space-between; }
+    .pick button { flex:1; padding:12px 14px; border-radius:12px; }
+    .yes { background: linear-gradient(180deg, #9bdb6b, #7dc14c); color:#0a1507; border-color:#6fb13f; }
+    .no { background: linear-gradient(180deg, #ff6b6b, #e45b5b); color:#220707; border-color:#c84a4a; }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#0a0e1f; border:1px solid var(--border); padding:2px 6px; border-radius:6px; font-size:12px; color:#c4cbda; }
+    .hidden { display:none !important; }
+    .summary { margin-top:26px; display:grid; grid-template-columns:1fr; gap:24px; }
+    .grid { display:grid; grid-template-columns: repeat(6, 1fr); gap:12px; }
+    @media (max-width:1200px){ .grid { grid-template-columns: repeat(4,1fr);} }
+    @media (max-width:860px){ .grid { grid-template-columns: repeat(2,1fr);} }
+    .mini { border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#141833; }
+    .mini img { width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
+    .mini .t { padding:8px 10px; font-size:14px; font-weight:600; }
+    .note { background:#10142a; border:1px dashed var(--border); padding:10px 12px; border-radius:10px; }
+    footer { margin:40px 0 20px; color:var(--muted); font-size:13px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Smash or Pass – This or That</h1>
+        <div class="muted">Pary i obrazy z pliku <code>data/pairs.json</code>. Klawiatura: <span class="kbd">←</span> / <span class="kbd">→</span>.</div>
+      </div>
+      <div class="toolbar">
+        <button id="btn-restart">Zagraj od nowa</button>
+        <button id="btn-export" class="btn-primary">Pobierz wyniki (JSON)</button>
+      </div>
+    </header>
+
+    <div class="progress" aria-label="Postęp"><div id="bar" class="bar"></div></div>
+
+    <section id="game" class="stage" aria-live="polite">
+      <article class="card" id="left-card" tabindex="0" aria-label="Lewa opcja">
+        <div class="media"><img id="left-img" alt="" /></div>
+        <div class="caption" id="left-cap"></div>
+        <div class="pick">
+          <button class="yes" id="left-yes" aria-label="Wybierz lewą opcję">Wybieram</button>
+          <button class="no" id="left-no" aria-label="Odrzuć lewą opcję">Odrzuć</button>
+        </div>
+      </article>
+      <article class="card" id="right-card" tabindex="0" aria-label="Prawa opcja">
+        <div class="media"><img id="right-img" alt="" /></div>
+        <div class="caption" id="right-cap"></div>
+        <div class="pick">
+          <button class="yes" id="right-yes" aria-label="Wybierz prawą opcję">Wybieram</button>
+          <button class="no" id="right-no" aria-label="Odrzuć prawą opcję">Odrzuć</button>
+        </div>
+      </article>
+    </section>
+
+    <section id="summary" class="summary hidden">
+      <div>
+        <h2 style="margin:0 0 6px;">Twoje wybory</h2>
+        <div class="grid" id="chosen-grid"></div>
+      </div>
+      <div>
+        <h2 style="margin:0 0 6px;">Odrzucone</h2>
+        <div class="grid" id="rejected-grid"></div>
+      </div>
+      <div class="note muted">Plik <strong>data/pairs.json</strong> zawiera wszystkie rundy w kolejności. Każda runda to dokładnie zdefiniowana para: <em>left</em> ↔ <em>right</em>.
+      </div>
+    </section>
+
+    <footer>Made for Mateusz • Frontend only • JSON jako źródło danych.</footer>
+  </div>
+
+<script>
+/********************
+ * Oczekujemy pliku data/pairs.json o strukturze:
+ * {
+ *   "pairs": [
+ *     { "left":  {"id":"a","title":"Kot","img":"img/kot.jpg"},
+ *       "right": {"id":"b","title":"Pies","img":"img/pies.jpg"} },
+ *     { "left":  {"id":"c","title":"Góry","img":"img/gory.jpg"},
+ *       "right": {"id":"d","title":"Plaża","img":"img/plaza.jpg"} }
+ *   ]
+ * }
+ ********************/
+const $ = (sel) => document.querySelector(sel);
+
+const state = {
+  round: 0,
+  pairs: [],        // [{left:{id,title,img}, right:{id,title,img}}, ...]
+  chosen: [],       // kolekcja obiektów (left/right) wybranych
+  rejected: [],     // kolekcja obiektów odrzuconych
+};
+
+function preloadImages(pairs){
+  pairs.flatMap(p => [p.left.img, p.right.img]).forEach(src => { const im = new Image(); im.src = src; });
+}
+
+async function loadPairs(){
+  const res = await fetch('data/pairs.json', { cache: 'no-store' });
+  if(!res.ok) throw new Error('Nie udało się pobrać data/pairs.json ('+res.status+')');
+  const data = await res.json();
+  if(!data || !Array.isArray(data.pairs)) throw new Error('Zła struktura data/pairs.json (brak par).');
+  return data.pairs;
+}
+
+function updateProgress(){
+  const total = state.pairs.length;
+  const done = Math.min(state.round, total);
+  $('#bar').style.width = (done/total*100 || 0) + '%';
+}
+
+function renderRound(){
+  updateProgress();
+  if(state.round >= state.pairs.length){ return showSummary(); }
+  const { left, right } = state.pairs[state.round];
+  $('#left-img').src = left.img;  $('#left-img').alt = left.title || left.id;  $('#left-cap').textContent = left.title || left.id;
+  $('#right-img').src = right.img; $('#right-img').alt = right.title || right.id; $('#right-cap').textContent = right.title || right.id;
+  $('#left-yes').onclick = ()=> pick(left, right);
+  $('#left-no').onclick  = ()=> pick(right, left);
+  $('#right-yes').onclick= ()=> pick(right, left);
+  $('#right-no').onclick = ()=> pick(left, right);
+}
+
+function pick(winObj, loseObj){
+  state.chosen.push(winObj);
+  state.rejected.push(loseObj);
+  state.round++;
+  renderRound();
+}
+
+function mkTile(item){
+  const div = document.createElement('div');
+  div.className = 'mini';
+  div.innerHTML = `<img src="${item.img}" alt="${item.title || item.id}"><div class="t">${item.title || item.id}</div>`;
+  return div;
+}
+
+function showSummary(){
+  $('#game').classList.add('hidden');
+  const cg = $('#chosen-grid');
+  const rg = $('#rejected-grid');
+  cg.innerHTML = '';
+  rg.innerHTML = '';
+  state.chosen.forEach(x => cg.appendChild(mkTile(x)));
+  state.rejected.forEach(x => rg.appendChild(mkTile(x)));
+  $('#summary').classList.remove('hidden');
+}
+
+function exportResults(){
+  const payload = {
+    timestamp: new Date().toISOString(),
+    rounds: state.pairs.length,
+    chosen: state.chosen,
+    rejected: state.rejected,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'wyniki-this-or-that.json';
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+
+$('#btn-restart').addEventListener('click', ()=> start());
+$('#btn-export').addEventListener('click', exportResults);
+
+window.addEventListener('keydown', (e)=>{
+  if($('#game').classList.contains('hidden')) return;
+  if(e.key === 'ArrowLeft'){ $('#left-yes').click(); }
+  if(e.key === 'ArrowRight'){ $('#right-yes').click(); }
+});
+
+async function start(){
+  state.round = 0; state.chosen = []; state.rejected = [];
+  $('#summary').classList.add('hidden');
+  $('#game').classList.remove('hidden');
+  try {
+    state.pairs = await loadPairs();
+  } catch(err){
+    console.error(err);
+    alert('Błąd: '+ err.message + '\nSprawdź czy istnieje plik data/pairs.json oraz poprawność struktury.');
+    state.pairs = [];
+  }
+  preloadImages(state.pairs);
+  renderRound();
+}
+
+start();
+</script>
+</body>
+</html>
