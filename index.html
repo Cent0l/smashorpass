@@ -1,217 +1,254 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Smash or Pass – This or That</title>
-  <meta name="description" content="Gra This or That: pary i obrazy definiowane w pliku JSON. Wybierz jedną z dwóch opcji, na końcu zobacz podsumowanie wybranych i odrzuconych." />
+  <title>Smash or Pass – demo</title>
   <style>
     :root {
-      --bg: #0f1221; --panel: #171a2b; --muted: #9aa3b2; --text: #e8ecf2;
-      --accent: #6ea8fe; --accent-2: #9bdb6b; --danger: #ff6b6b; --card: #1f2440; --border: #2e345a;
+      --bg: #0b0d12; --card:#151923; --muted:#9aa3b2; --text:#e8eefc; --accent:#6aa6ff; --bad:#f87171; --good:#34d399;
     }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif; background: radial-gradient(1200px 600px at 70% -10%, #22284a 0%, var(--bg) 55%); color: var(--text); }
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px; }
-    header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; }
-    h1 { font-size:24px; margin:0; letter-spacing:.3px; }
-    .muted { color:var(--muted); font-size:14px; }
-    .toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    button { background: var(--panel); color: var(--text); border:1px solid var(--border); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600; letter-spacing:.2px; }
-    button:hover { filter: brightness(1.06); }
-    .btn-primary { background: linear-gradient(180deg, #6ea8fe, #5b90e6); border-color:#4c7ad0; color:#0b1630; }
-    .progress { width:100%; height:10px; background:#0d1122; border:1px solid var(--border); border-radius:999px; overflow:hidden; }
-    .bar { height:100%; width:0%; background: linear-gradient(90deg, #6ea8fe, #9bdb6b); transition: width .25s ease; }
-
-    .stage { display:grid; grid-template-columns: 1fr 1fr; gap:18px; margin-top:18px; }
-    @media (max-width:860px){ .stage { grid-template-columns:1fr; } }
-
-    .card { position:relative; overflow:hidden; background:var(--card); border:1px solid var(--border); border-radius:16px; box-shadow:0 10px 24px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.02); display:flex; flex-direction:column; transition: transform .12s ease, box-shadow .12s ease; }
-    .card:hover { transform: translateY(-2px); box-shadow:0 14px 30px rgba(0,0,0,.32); }
-    .media { aspect-ratio: 4/3; width:100%; background:#10142a; display:grid; place-items:center; overflow:hidden; }
-    .media img { width:100%; height:100%; object-fit:cover; display:block; }
-    .caption { padding:12px 14px; font-weight:700; border-top:1px solid var(--border); }
-    .pick { position:absolute; inset:auto 12px 12px 12px; display:flex; gap:10px; justify-content:space-between; }
-    .pick button { flex:1; padding:12px 14px; border-radius:12px; }
-    .yes { background: linear-gradient(180deg, #9bdb6b, #7dc14c); color:#0a1507; border-color:#6fb13f; }
-    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#0a0e1f; border:1px solid var(--border); padding:2px 6px; border-radius:6px; font-size:12px; color:#c4cbda; }
-    .hidden { display:none !important; }
-    .summary { margin-top:26px; display:grid; grid-template-columns:1fr; gap:24px; }
-    .grid { display:grid; grid-template-columns: repeat(6, 1fr); gap:12px; }
-    @media (max-width:1200px){ .grid { grid-template-columns: repeat(4,1fr);} }
-    @media (max-width:860px){ .grid { grid-template-columns: repeat(2,1fr);} }
-    .mini { border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#141833; }
-    .mini img { width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
-    .mini .t { padding:8px 10px; font-size:14px; font-weight:600; }
-    .note { background:#10142a; border:1px dashed var(--border); padding:10px 12px; border-radius:10px; }
-    footer { margin:40px 0 20px; color:var(--muted); font-size:13px; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:linear-gradient(180deg,#0b0d12 0%,#0f1320 100%);color:var(--text);}
+    header{max-width:960px;margin:24px auto 8px;padding:0 16px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+    h1{font-size:20px;margin:0;letter-spacing:.4px}
+    .hint{font-size:13px;color:var(--muted)}
+    .wrap{max-width:960px;margin:0 auto;padding:16px}
+    .arena{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .card{background:var(--card);border:1px solid #263042;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;min-height:420px;box-shadow:0 6px 30px rgba(0,0,0,.3)}
+    .media{position:relative;aspect-ratio:1/1;display:grid;place-items:center;background:#0c1018}
+    .media img{width:100%;height:100%;object-fit:cover;display:block}
+    .label{padding:12px 14px;border-top:1px solid #263042;display:flex;align-items:center;gap:8px}
+    .label b{font-size:15px}
+    button.pick{margin:12px 14px 16px;padding:12px 14px;border-radius:12px;border:1px solid #2a3a55;background:#152036;color:var(--text);cursor:pointer;font-weight:600}
+    button.pick:hover{filter:brightness(1.1)}
+    .left button.pick{outline:2px solid transparent}
+    .right button.pick{outline:2px solid transparent}
+    .left button.pick.choose{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.35)}
+    .right button.pick.choose{background:rgba(106,166,255,.12);border-color:rgba(106,166,255,.4)}
+    .err{position:absolute;inset:auto 8px 8px 8px;background:rgba(12,16,24,.85);border:1px dashed #43516d;border-radius:10px;padding:10px;color:var(--muted);font-size:12px}
+    .controls{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:10px}
+    .controls .key{border:1px solid #2a3a55;border-radius:8px;padding:6px 10px;font-size:12px;color:var(--muted)}
+    .progress{margin:18px auto 8px;max-width:960px;height:8px;background:#121827;border:1px solid #263042;border-radius:999px;overflow:hidden}
+    .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#9b7bff)}
+    .hidden{display:none}
+    /* Summary */
+    .summary{max-width:1000px;margin:28px auto;padding:0 16px}
+    .summary h2{font-size:18px;margin:6px 0 14px;color:#d7dff0}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+    .tile{background:#101520;border:1px solid #243042;border-radius:12px;overflow:hidden}
+    .tile img{width:100%;height:120px;object-fit:cover;display:block}
+    .tile .cap{padding:8px 10px;font-size:13px;color:#c6d0e3}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid #30415b;font-size:12px;color:var(--muted)}
+    .lists{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    @media (max-width:820px){.arena{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
+  <header>
+    <h1>Smash or Pass</h1>
+    <div class="hint">Sterowanie: ←/A wybiera lewą, →/D prawą • Kliknięcie też działa</div>
+  </header>
+
+  <div class="progress"><div class="bar" id="bar"></div></div>
+
   <div class="wrap">
-    <header>
-      <div>
-        <h1>Smash or Pass – This or That</h1>
-        <div class="muted">Pary i obrazy z pliku <code>data/pairs.json</code>. Klawiatura: <span class="kbd">←</span> / <span class="kbd">→</span>. Jeśli otwierasz <code>index.html</code> z dysku (file://), przeglądarka może blokować wczytanie JSON – wtedy użyj lokalnego serwera lub wstaw JSON w tagu „inline” na dole.</div>
-      </div>
-      <div class="toolbar">
-        <button id="btn-restart">Zagraj od nowa</button>
-        <button id="btn-export" class="btn-primary">Pobierz wyniki (JSON)</button>
-      </div>
-    </header>
+    <section id="game" class="arena" aria-live="polite"></section>
 
-    <div class="progress" aria-label="Postęp"><div id="bar" class="bar"></div></div>
+    <div class="controls" id="controls"></div>
 
-    <section id="game" class="stage" aria-live="polite">
-      <article class="card" id="left-card" tabindex="0" aria-label="Lewa opcja">
-        <div class="media"><img id="left-img" alt="" /></div>
-        <div class="caption" id="left-cap"></div>
-        <div class="pick">
-          <button class="yes" id="left-yes" aria-label="Wybierz lewą opcję">Wybieram</button>
-        </div>
-      </article>
-      <article class="card" id="right-card" tabindex="0" aria-label="Prawa opcja">
-        <div class="media"><img id="right-img" alt="" /></div>
-        <div class="caption" id="right-cap"></div>
-        <div class="pick">
-          <button class="yes" id="right-yes" aria-label="Wybierz prawą opcję">Wybieram</button>
-        </div>
-      </article>
-    </section>
-
-    <section id="summary" class="summary hidden">
-      <div>
-        <h2 style="margin:0 0 6px;">Twoje wybory</h2>
-        <div class="grid" id="chosen-grid"></div>
-      </div>
-      <div>
-        <h2 style="margin:0 0 6px;">Odrzucone</h2>
-        <div class="grid" id="rejected-grid"></div>
-      </div>
-      <div class="note muted">Plik <strong>data/pairs.json</strong> zawiera wszystkie rundy w kolejności. Każda runda to dokładnie zdefiniowana para: <em>left</em> ↔ <em>right</em>.</div>
-    </section>
-
-    <footer>Made for Mateusz • Frontend only • JSON jako źródło danych.</footer>
+    <section id="summary" class="summary hidden"></section>
   </div>
 
-  <!-- Fallback do testów lokalnych (gdy file:// blokuje fetch). Wklej tutaj swój JSON lub zostaw pusty obiekt.
-       Używany TYLKO, gdy fetch('data/pairs.json') się nie powiedzie. -->
-  <script id="pairs-inline" type="application/json">{"pairs":[]}</script>
+  <script>
+  // === KONFIG DANYCH ===
+  // Ładujemy dokładnie taki format jak przesłałeś:
+  // {
+  //   "pairs": [
+  //     { "left": {"id":"1","title":"...","img":"img/1.png"},
+  //       "right": {"id":"2","title":"...","img":"img/2.png"} },
+  //     ...
+  //   ]
+  // }
 
-<script>
-const $ = (sel) => document.querySelector(sel);
+  const PATH_JSON = './data/pairs.json';
 
-const state = {
-  round: 0,
-  pairs: [],        // [{left:{id,title,img}, right:{id,title,img}}, ...]
-  chosen: [],       // wybrane obiekty
-  rejected: [],     // odrzucone obiekty
-};
+  const state = { i: 0, pairs: [], chosen: [], rejected: [] };
 
-function preloadImages(pairs){
-  pairs.flatMap(p => [p.left.img, p.right.img]).forEach(src => { const im = new Image(); im.src = src; });
-}
+  const gameEl = document.getElementById('game');
+  const barEl = document.getElementById('bar');
+  const summaryEl = document.getElementById('summary');
+  const controlsEl = document.getElementById('controls');
 
-async function loadPairs(){
-  // próba pobrania z pliku
-  try {
-    const res = await fetch('data/pairs.json', { cache: 'no-store' });
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    if(!data || !Array.isArray(data.pairs)) throw new Error('Zła struktura data/pairs.json (brak par).');
-    return data.pairs;
-  } catch(err){
-    // fallback: inline JSON (na potrzeby uruchamiania z file://)
-    try {
-      const raw = document.getElementById('pairs-inline')?.textContent || '{}';
-      const data = JSON.parse(raw);
-      if(Array.isArray(data.pairs)){
-        console.warn('Używam wbudowanego JSON (pairs-inline). Powód błędu fetch:', err.message);
-        return data.pairs;
-      }
-    } catch(_){}
-    throw err;
+  // Utils
+  function isUrlLike(s){
+    if(!s) return false;
+    // traktuj jako gotową ścieżkę jeśli to URL lub już zawiera separator katalogu
+    return /^(https?:)?\/\//.test(s) || s.startsWith('./') || s.startsWith('../') || s.startsWith('/') || s.includes('/');
   }
-}
-
-function updateProgress(){
-  const total = state.pairs.length;
-  const done = Math.min(state.round, total);
-  $('#bar').style.width = (done/total*100 || 0) + '%';
-}
-
-function renderRound(){
-  updateProgress();
-  if(state.round >= state.pairs.length){ return showSummary(); }
-  const { left, right } = state.pairs[state.round];
-  $('#left-img').src = left.img;  $('#left-img').alt = left.title || left.id;  $('#left-cap').textContent = left.title || left.id;
-  $('#right-img').src = right.img; $('#right-img').alt = right.title || right.id; $('#right-cap').textContent = right.title || right.id;
-  $('#left-yes').onclick  = ()=> pick(left, right);
-  $('#right-yes').onclick = ()=> pick(right, left);
-}
-
-function pick(winObj, loseObj){
-  state.chosen.push(winObj);
-  state.rejected.push(loseObj);
-  state.round++;
-  renderRound();
-}
-
-function mkTile(item){
-  const div = document.createElement('div');
-  div.className = 'mini';
-  div.innerHTML = `<img src="${item.img}" alt="${item.title || item.id}"><div class="t">${item.title || item.id}</div>`;
-  return div;
-}
-
-function showSummary(){
-  $('#game').classList.add('hidden');
-  const cg = $('#chosen-grid');
-  const rg = $('#rejected-grid');
-  cg.innerHTML = '';
-  rg.innerHTML = '';
-  state.chosen.forEach(x => cg.appendChild(mkTile(x)));
-  state.rejected.forEach(x => rg.appendChild(mkTile(x)));
-  $('#summary').classList.remove('hidden');
-}
-
-function exportResults(){
-  const payload = {
-    timestamp: new Date().toISOString(),
-    rounds: state.pairs.length,
-    chosen: state.chosen,
-    rejected: state.rejected,
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'wyniki-this-or-that.json';
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-}
-
-$('#btn-restart').addEventListener('click', ()=> start());
-$('#btn-export').addEventListener('click', exportResults);
-
-window.addEventListener('keydown', (e)=>{
-  if($('#game').classList.contains('hidden')) return;
-  if(e.key === 'ArrowLeft'){ $('#left-yes').click(); }
-  if(e.key === 'ArrowRight'){ $('#right-yes').click(); }
-});
-
-async function start(){
-  state.round = 0; state.chosen = []; state.rejected = [];
-  $('#summary').classList.add('hidden');
-  $('#game').classList.remove('hidden');
-  try { state.pairs = await loadPairs(); }
-  catch(err){
-    alert('Nie wczytałem data/pairs.json. Jeśli uruchamiasz plik z dysku, przeglądarka blokuje fetch.\nUruchom lokalny serwer (np. VS Code: Live Server) albo wklej JSON w tagu #pairs-inline.\nSzczegóły: '+err.message);
-    state.pairs = [];
+  function withImgPrefix(src){
+    // Jeśli w JSON podasz np. "1.png" => dopniemy ./img/1.png
+    // Jeśli podasz "img/1.png" albo dowolną ścieżkę/URL => zostawiamy jak jest
+    return isUrlLike(src) ? src : `./img/${src}`;
   }
-  preloadImages(state.pairs);
-  renderRound();
-}
+  function escapeHtml(s){
+    return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+  }
+  function setProgress(){
+    const pct = state.pairs.length ? (state.i / state.pairs.length) * 100 : 0;
+    barEl.style.width = pct + '%';
+  }
+  function preload(src){
+    return new Promise((resolve)=>{
+      const img = new Image();
+      img.onload = ()=> resolve({ ok:true, img });
+      img.onerror = ()=> resolve({ ok:false });
+      img.src = src;
+    });
+  }
 
-start();
+  // Normalizacja DOKŁADNIE pod Twój schemat
+  function normalizePairsFromExact(json){
+    const arr = Array.isArray(json?.pairs) ? json.pairs : [];
+    return arr.map(item => {
+      const L = item?.left ?? {}; const R = item?.right ?? {};
+      const left = {
+        id: L.id ?? null,
+        label: L.title ?? (L.img ? L.img.split('/').pop() : ''),
+        src: withImgPrefix(L.img ?? L.src ?? L.path ?? '')
+      };
+      const right = {
+        id: R.id ?? null,
+        label: R.title ?? (R.img ? R.img.split('/').pop() : ''),
+        src: withImgPrefix(R.img ?? R.src ?? R.path ?? '')
+      };
+      return { left, right };
+    }).filter(p => p.left.src && p.right.src);
+  }
+
+  async function boot(){
+    try{
+      const res = await fetch(PATH_JSON, { cache: 'no-store' });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      state.pairs = normalizePairsFromExact(json);
+      if(!state.pairs.length){ throw new Error('Brak par w pliku JSON.'); }
+      renderPair();
+    }catch(err){
+      console.error('Błąd ładowania JSON:', err);
+      gameEl.innerHTML = `
+        <div class="card" style="grid-column:1/-1;min-height:auto">
+          <div class="label"><b>Nie udało się wczytać ./data/pairs.json</b></div>
+          <div class="label" style="color:#9aa3b2">Sprawdź ścieżkę, gałąź Pages i format danych. Szczegóły w konsoli.</div>
+        </div>`;
+    }
+  }
+
+  async function renderPair(){
+    gameEl.innerHTML = '';
+    controlsEl.innerHTML = '';
+    setProgress();
+    if(state.i >= state.pairs.length){
+      return showSummary();
+    }
+    const pair = state.pairs[state.i];
+    const [pl, pr] = await Promise.all([preload(pair.left.src), preload(pair.right.src)]);
+
+    const leftCard = createCard(pair.left, 'left', pl.ok);
+    const rightCard = createCard(pair.right, 'right', pr.ok);
+    gameEl.appendChild(leftCard);
+    gameEl.appendChild(rightCard);
+
+    const next = state.pairs[state.i+1];
+    if(next){ preload(next.left.src); preload(next.right.src); }
+
+    controlsEl.innerHTML = '<span class="key">← / A</span> wybierz lewą • <span class="key">→ / D</span> wybierz prawą';
+  }
+
+  function createCard(item, side, ok){
+    const card = document.createElement('article');
+    card.className = `card ${side}`;
+
+    const media = document.createElement('div');
+    media.className = 'media';
+    const img = document.createElement('img');
+    img.alt = item.label || '';
+    img.src = item.src;
+    media.appendChild(img);
+    if(!ok){
+      const err = document.createElement('div');
+      err.className = 'err';
+      err.textContent = 'Nie udało się wczytać obrazu. Sprawdź ścieżkę/HTTPS i wielkość liter w nazwie pliku.';
+      media.appendChild(err);
+    }
+
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.innerHTML = `<span class="pill">${side==='left'?'lewa':'prawa'}</span> <b>${escapeHtml(item.label)}</b>`;
+
+    const btn = document.createElement('button');
+    btn.className = 'pick';
+    btn.textContent = side==='left' ? 'Wybieram lewą' : 'Wybieram prawą';
+    btn.addEventListener('click', ()=> choose(side));
+
+    card.append(media,label,btn);
+    card.addEventListener('click', (e)=>{ if(e.target.tagName.toLowerCase()!=='button') choose(side); });
+    return card;
+  }
+
+  function choose(side){
+    const pair = state.pairs[state.i];
+    const pick = side==='left' ? pair.left : pair.right;
+    const reject = side==='left' ? pair.right : pair.left;
+    state.chosen.push(pick);
+    state.rejected.push(reject);
+    state.i++;
+    renderPair();
+  }
+
+  function renderGrid(items){
+    const tiles = items.map(it=> `
+      <div class="tile">
+        <img src="${it.src}" alt="${escapeHtml(it.label)}" onerror="this.parentElement.querySelector('.cap').textContent='[BŁĄD OBRAZU] '+this.parentElement.querySelector('.cap').textContent"/>
+        <div class="cap">${escapeHtml(it.label)}</div>
+      </div>
+    `).join('');
+    return `<div class="grid">${tiles}</div>`;
+  }
+
+  function showSummary(){
+    document.getElementById('game').classList.add('hidden');
+    controlsEl.classList.add('hidden');
+    summaryEl.classList.remove('hidden');
+
+    const chosenGrid = renderGrid(state.chosen);
+    const rejectedGrid = renderGrid(state.rejected);
+
+    summaryEl.innerHTML = `
+      <h2>Podsumowanie</h2>
+      <div class="lists">
+        <div>
+          <h3>Wybrane (${state.chosen.length})</h3>
+          ${chosenGrid}
+        </div>
+        <div>
+          <h3>Odrzucone (${state.rejected.length})</h3>
+          ${rejectedGrid}
+        </div>
+      </div>
+    `;
+  }
+
+  // Klawiatura
+  addEventListener('keydown', (e)=>{
+    if(summaryEl && !summaryEl.classList.contains('hidden')) return;
+    if(e.key==='ArrowLeft' || e.key==='a' || e.key==='A') { choose('left'); }
+    if(e.key==='ArrowRight'|| e.key==='d' || e.key==='D') { choose('right'); }
+  });
+
+  // Start po załadowaniu DOM
+  document.addEventListener('DOMContentLoaded', boot);
 </script>
 </body>
 </html>
