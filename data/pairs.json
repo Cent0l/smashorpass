@@ -1,13 +1,13 @@
 {
   "pairs": [
     {
-      "left":  { "id": "a", "title": "mazda mx5 miata", "img": "img/a.jpg" },
-      "right": { "id": "b", "title": "optimus prime",     "img": "img/b.jpg" }
+      "left":  { "id": "a", "title": "mazda mx5 miata", "img": "img/1.png" },
+      "right": { "id": "b", "title": "optimus prime",     "img": "img/2.png" }
     },
     {
-      "left":  { "id": "c", "title": "Siimone-Alvin i wiewórki 3",  "img": "img/c.jpg" },
-      "right": { "id": "d", "title": "The Thing z The Thing","img": "img/d.jpg" }
+      "left":  { "id": "c", "title": "Siimone-Alvin i wiewórki 3",  "img": "img/3.png"  },
+      "right": { "id": "d", "title": "The Thing z The Thing","img": "img/4.png"  }
     }
-    // ... kolejne pary: e↔f, g↔h itd.
+  
   ]
 }
