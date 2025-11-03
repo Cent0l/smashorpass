@@ -121,10 +121,10 @@
     // ==========================================
 
     // Spróbujemy automatycznie obu nazw plików z danymi
-const JSON_PATHS = ['./data/pair.json', './data/pairs.json']; // ścieżka do Twojego pliku JSON
+const PATH_JSON = './data/pairs.json'; // ścieżka do Twojego pliku JSON
 
     // Stan aplikacji: indeks aktualnej pary, listy par i wyników
-    
+    const state = { i: 0, pairs: [], chosen: [], rejected: [], locked: false };
 
     // Skróty do elementów DOM
     const gameEl = document.getElementById('game');
@@ -174,20 +174,25 @@ const JSON_PATHS = ['./data/pair.json', './data/pairs.json']; // ścieżka do Tw
         const left  = { label: L.title, src: withImgPrefix(L.img) };
         const right = { label: R.title, src: withImgPrefix(R.img) };
         return { left, right };
-      }).filter(p => p.left.src && p.right.// ===========================================
+      }).filter(p => p.left.src && p.right.src);
+    }
+
+    // ===========================================
     // START – wczytanie danych i pierwsza para
     // ===========================================
 
     async function boot(){
       try{
-        let json = null; let lastErr = null;
-        for(const p of JSON_PATHS){
-          try{
-            const res = await fetch(p, { cache: 'no-store' });
-            if(!res.ok) throw new Error(`HTTP ${res.status} @ ${p}`);
-            json = await res.json();
-            break;
-          }catch(e){ lastErr = e; }
+        const res = await fetch(PATH_JSON, { cache: 'no-store' });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        state.pairs = normalizePairs(json);
+        renderPair();
+      }catch(err){
+        console.error('Błąd ładowania JSON:', err);
+        gameEl.innerHTML = `<div class="card" style="grid-column:1/-1;min-height:auto"><div class="label"><b>Nie udało się wczytać danych</b></div><div class="label" style="color:#9aa3b2">Sprawdź, czy istnieje <code>data/pairs.json</code> w tej gałęzi Pages.</div></div>`;
+      }
+    }catch(e){ lastErr = e; }
         }
         if(!json) throw lastErr || new Error('Nie znaleziono pliku data/pair(s).json');
         state.pairs = normalizePairs(json);
@@ -196,8 +201,6 @@ const JSON_PATHS = ['./data/pair.json', './data/pairs.json']; // ścieżka do Tw
         console.error('Błąd ładowania JSON:', err);
         gameEl.innerHTML = `<div class="card" style="grid-column:1/-1;min-height:auto"><div class="label"><b>Nie udało się wczytać danych</b></div><div class="label" style="color:#9aa3b2">Sprawdzone: <code>data/pair.json</code> i <code>data/pairs.json</code>. Zobacz konsolę.</div></div>`;
       }
-    }>`;
-      }
     }
 
     // ==========================================
@@ -205,8 +208,6 @@ const JSON_PATHS = ['./data/pair.json', './data/pairs.json']; // ścieżka do Tw
     // ==========================================
 
     async function renderPair(){
-      // zablokuj wejście na czas przygotowania pary
-      state.locked = true;
       gameEl.innerHTML = '';
       setProgress();
 
@@ -228,9 +229,6 @@ const JSON_PATHS = ['./data/pair.json', './data/pairs.json']; // ścieżka do Tw
       const rightCard = createCard(pair.right, 'right', pr.ok);
       gameEl.appendChild(leftCard);
       gameEl.appendChild(rightCard);
-
-      // odblokuj po zrenderowaniu kart
-      state.locked = false;
     }
 
     // Tworzy pojedynczą kartę (obraz + podpis + przycisk)
@@ -274,6 +272,8 @@ const JSON_PATHS = ['./data/pair.json', './data/pairs.json']; // ścieżka do Tw
     // ==========================================
 
     function choose(side){
+      if(state.locked) return;
+      state.locked = true;
       // blokada wielokrotnych wyborów w trakcie animacji
       if(state.locked) return;
       state.locked = true;
@@ -325,6 +325,7 @@ const JSON_PATHS = ['./data/pair.json', './data/pairs.json']; // ścieżka do Tw
     // A/← wybiera lewą, D/→ wybiera prawą – bez wyświetlania instrukcji na UI
     // ==========================================
     addEventListener('keydown', (e)=>{
+      if(state.locked) return;
       if(state.locked) return;
       if(summaryEl && !summaryEl.classList.contains('hidden')) return; // nie działa na ekranie podsumowania
       if(e.key==='ArrowLeft' || e.key==='a' || e.key==='A') choose('left');
