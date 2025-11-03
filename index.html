@@ -70,7 +70,6 @@
         <div class="caption" id="left-cap"></div>
         <div class="pick">
           <button class="yes" id="left-yes" aria-label="Wybierz lewą opcję">Wybieram</button>
-        
         </div>
       </article>
       <article class="card" id="right-card" tabindex="0" aria-label="Prawa opcja">
@@ -78,14 +77,8 @@
         <div class="caption" id="right-cap"></div>
         <div class="pick">
           <button class="yes" id="right-yes" aria-label="Wybierz prawą opcję">Wybieram</button>
-          
         </div>
-      </article>
-    </section>
-
-    <section id="summary" class="summary hidden">
-      <div>
-        <h2 style="margin:0 0 6px;">Twoje wybory</h2>
+      </article>yle="margin:0 0 6px;">Twoje wybory</h2>
         <div class="grid" id="chosen-grid"></div>
       </div>
       <div>
@@ -101,13 +94,12 @@
 
 <script>
 /********************
- * Oczekujemy pliku data/pairs.json o strukturze:
+ * Struktura danych: data/pairs.json (pary ustalone z góry)
  * {
  *   "pairs": [
- *     { "left":  {"id":"a","title":"Kot","img":"img/kot.jpg"},
- *       "right": {"id":"b","title":"Pies","img":"img/pies.jpg"} },
- *     { "left":  {"id":"c","title":"Góry","img":"img/gory.jpg"},
- *       "right": {"id":"d","title":"Plaża","img":"img/plaza.jpg"} }
+ *     { "left": {"id":"1","title":"Mazda MX-5 Miata","img":"img/1.png"},
+ *       "right": {"id":"2","title":"Optimus Prime (Transformers)","img":"img/2.png"} },
+ *     ...
  *   ]
  * }
  ********************/
@@ -116,8 +108,8 @@ const $ = (sel) => document.querySelector(sel);
 const state = {
   round: 0,
   pairs: [],        // [{left:{id,title,img}, right:{id,title,img}}, ...]
-  chosen: [],       // kolekcja obiektów (left/right) wybranych
-  rejected: [],     // kolekcja obiektów odrzuconych
+  chosen: [],       // wybrane obiekty
+  rejected: [],     // odrzucone obiekty
 };
 
 function preloadImages(pairs){
@@ -144,10 +136,9 @@ function renderRound(){
   const { left, right } = state.pairs[state.round];
   $('#left-img').src = left.img;  $('#left-img').alt = left.title || left.id;  $('#left-cap').textContent = left.title || left.id;
   $('#right-img').src = right.img; $('#right-img').alt = right.title || right.id; $('#right-cap').textContent = right.title || right.id;
+  // jeden przycisk „Wybieram” na każdej karcie
   $('#left-yes').onclick = ()=> pick(left, right);
-  $('#left-no').onclick  = ()=> pick(right, left);
   $('#right-yes').onclick= ()=> pick(right, left);
-  $('#right-no').onclick = ()=> pick(left, right);
 }
 
 function pick(winObj, loseObj){
@@ -191,6 +182,7 @@ function exportResults(){
 $('#btn-restart').addEventListener('click', ()=> start());
 $('#btn-export').addEventListener('click', exportResults);
 
+// Klawiatura: ← wybiera lewą, → wybiera prawą
 window.addEventListener('keydown', (e)=>{
   if($('#game').classList.contains('hidden')) return;
   if(e.key === 'ArrowLeft'){ $('#left-yes').click(); }
@@ -201,13 +193,8 @@ async function start(){
   state.round = 0; state.chosen = []; state.rejected = [];
   $('#summary').classList.add('hidden');
   $('#game').classList.remove('hidden');
-  try {
-    state.pairs = await loadPairs();
-  } catch(err){
-    console.error(err);
-    alert('Błąd: '+ err.message + '\nSprawdź czy istnieje plik data/pairs.json oraz poprawność struktury.');
-    state.pairs = [];
-  }
+  try { state.pairs = await loadPairs(); }
+  catch(err){ console.error(err); alert('Błąd: '+ err.message + '\nSprawdź plik data/pairs.json.'); state.pairs = []; }
   preloadImages(state.pairs);
   renderRound();
 }
