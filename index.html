@@ -3,71 +3,159 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Smash or Pass – demo</title>
+  <title>Smash or Pass – demo (z komentarzami)</title>
   <style>
+    /* =============================
+       ZMIENNE KOLORÓW I BAZOWY STYL
+       ============================= */
     :root {
-      --bg: #0b0d12; --card:#151923; --muted:#9aa3b2; --text:#e8eefc; --accent:#6aa6ff;
+      --bg: #0b0d12;      /* tło strony (ciemny gradient start) */
+      --card:#151923;     /* tło kart */
+      --muted:#9aa3b2;    /* kolor tekstu pomocniczego */
+      --text:#e8eefc;     /* główny kolor tekstu */
+      --accent:#6aa6ff;   /* akcent (ramka przy wyborze, progress) */
     }
-    *{box-sizing:border-box}
-    html,body{min-height:100%}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:linear-gradient(180deg,#0b0d12 0%,#0f1320 100%);color:var(--text);min-height:100%;background-repeat:no-repeat;background-attachment:fixed;}
-    header{max-width:960px;margin:24px auto 8px;padding:0 16px;display:flex;gap:12px;align-items:center;justify-content:space-between}
-    h1{font-size:20px;margin:0;letter-spacing:.4px}
-    .wrap{max-width:960px;margin:0 auto;padding:16px}
-    .arena{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .card{background:var(--card);border:1px solid #263042;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;min-height:420px;box-shadow:0 6px 30px rgba(0,0,0,.3);transition:opacity 0.6s ease, transform 0.6s ease;}
-    .card.fade-out{opacity:0;transform:scale(0.9);}
-    .card.stay{opacity:1;transform:scale(1.05);border-color:var(--accent);}
-    .media{position:relative;aspect-ratio:1/1;display:grid;place-items:center;background:#0c1018}
-    .media img{width:100%;height:100%;object-fit:cover;display:block}
-    .label{padding:12px 14px;border-top:1px solid #263042;display:flex;align-items:center;gap:8px}
-    .label b{font-size:15px}
-    button.pick{margin:12px 14px 16px;padding:12px 14px;border-radius:12px;border:1px solid #2a3a55;background:#152036;color:var(--text);cursor:pointer;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;transition:background 0.2s ease}
-    button.pick:hover{filter:brightness(1.1)}
-    .progress{margin:18px auto 8px;max-width:960px;height:8px;background:#121827;border:1px solid #263042;border-radius:999px;overflow:hidden}
-    .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#9b7bff)}
-    .hidden{display:none}
-    .summary{max-width:1000px;margin:28px auto;padding:0 16px}
-    .summary h2{font-size:18px;margin:6px 0 14px;color:#d7dff0}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
-    .tile{background:#101520;border:1px solid #243042;border-radius:12px;overflow:hidden}
-    .tile img{width:100%;height:120px;object-fit:cover;display:block}
-    .tile .cap{padding:8px 10px;font-size:13px;color:#c6d0e3}
-    .lists{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-    @media (max-width:820px){.arena{grid-template-columns:1fr}}
+
+    *{ box-sizing:border-box }
+
+    /*
+      Używamy min-height zamiast height:100% aby tło nie urywało się poniżej okna.
+      background-attachment: fixed – gradient nie „skroluje” oddzielnie.
+    */
+    html,body{ min-height:100% }
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;
+      background:linear-gradient(180deg,#0b0d12 0%,#0f1320 100%);
+      color:var(--text);
+      background-repeat:no-repeat;
+      background-attachment:fixed;
+    }
+
+    /* ======= NAGŁÓWEK ======= */
+    header{
+      max-width:960px;              /* szerokość treści */
+      margin:24px auto 8px;         /* wyśrodkowanie + odstępy */
+      padding:0 16px;               /* oddech po bokach */
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+    }
+    h1{ font-size:20px; margin:0; letter-spacing:.4px }
+
+    /* ======= KONTENER I ARENA ======= */
+    .wrap{ max-width:960px; margin:0 auto; padding:16px }
+    .arena{ display:grid; grid-template-columns:1fr 1fr; gap:16px }
+
+    /* ======= KARTA (OBRAZ + PODPIS + PRZYCISK) ======= */
+    .card{
+      background:var(--card);
+      border:1px solid #263042;
+      border-radius:16px;
+      overflow:hidden;
+      display:flex; flex-direction:column; min-height:420px;
+      box-shadow:0 6px 30px rgba(0,0,0,.3);
+      /* płynne efekty przy wyborze */
+      transition:opacity .6s ease, transform .6s ease;
+    }
+    /* Odrzucona karta: zanika i lekko się zmniejsza */
+    .card.fade-out{ opacity:0; transform:scale(.9) }
+    /* Wybrana karta: zostaje, delikatnie powiększona, ramka w kolorze akcentu */
+    .card.stay{ opacity:1; transform:scale(1.05); border-color:var(--accent) }
+
+    /* Obszar obrazu – kwadrat 1:1 */
+    .media{ position:relative; aspect-ratio:1/1; display:grid; place-items:center; background:#0c1018 }
+    .media img{ width:100%; height:100%; object-fit:cover; display:block }
+
+    /* Pasek z tytułem pod obrazem */
+    .label{ padding:12px 14px; border-top:1px solid #263042; display:flex; align-items:center; gap:8px }
+    .label b{ font-size:15px }
+
+    /* Przycisk akcji "Smash" */
+    button.pick{
+      margin:12px 14px 16px; padding:12px 14px; border-radius:12px;
+      border:1px solid #2a3a55; background:#152036; color:var(--text);
+      cursor:pointer; font-weight:600; text-transform:uppercase; letter-spacing:.5px;
+      transition:background .2s ease;
+    }
+    button.pick:hover{ filter:brightness(1.1) }
+
+    /* Pasek postępu – pokazuje ile par już oceniono */
+    .progress{ margin:18px auto 8px; max-width:960px; height:8px; background:#121827; border:1px solid #263042; border-radius:999px; overflow:hidden }
+    .bar{ height:100%; width:0; background:linear-gradient(90deg,var(--accent),#9b7bff) }
+
+    /* PODSUMOWANIE – dwie listy: wybrane i odrzucone */
+    .summary{ max-width:1000px; margin:28px auto; padding:0 16px }
+    .summary h2{ font-size:18px; margin:6px 0 14px; color:#d7dff0 }
+
+    .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px }
+    .tile{ background:#101520; border:1px solid #243042; border-radius:12px; overflow:hidden }
+    .tile img{ width:100%; height:120px; object-fit:cover; display:block }
+    .tile .cap{ padding:8px 10px; font-size:13px; color:#c6d0e3 }
+
+    .lists{ display:grid; grid-template-columns:1fr 1fr; gap:20px }
+
+    /* Na telefonach jedna kolumna */
+    @media (max-width:820px){ .arena{ grid-template-columns:1fr } }
+
+    .hidden{ display:none }
   </style>
 </head>
 <body>
+  <!-- Nagłówek strony -->
   <header>
     <h1>Smash or Pass</h1>
   </header>
 
+  <!-- Pasek postępu -->
   <div class="progress"><div class="bar" id="bar"></div></div>
 
   <div class="wrap">
+    <!-- Miejsce na dwie aktualne karty (renderowane w JS) -->
     <section id="game" class="arena" aria-live="polite"></section>
+    <!-- Podsumowanie wyborów po zakończeniu gry -->
     <section id="summary" class="summary hidden"></section>
   </div>
 
   <script>
-    const PATH_JSON = './data/pairs.json';
+    // ==========================================
+    // KONFIGURACJA I STAN GRY
+    // ==========================================
 
-    const state = { i: 0, pairs: [], chosen: [], rejected: [] };
+    const PATH_JSON = './data/pair.json'; // ścieżka do Twojego pliku JSON
 
+    // Stan aplikacji: indeks aktualnej pary, listy par i wyników
+    const state = { i: 0, pairs: [], chosen:
+
+    // Skróty do elementów DOM
     const gameEl = document.getElementById('game');
     const barEl = document.getElementById('bar');
     const summaryEl = document.getElementById('summary');
 
+    // ==========================================
+    // FUNKCJE POMOCNICZE
+    // ==========================================
+
+    // Uzupełnia brakujący prefiks dla ścieżek (np. z "img/1.png" → "./img/1.png")
     function withImgPrefix(src){
       return /^(https?:)?\/\//.test(src) || src.startsWith('./') ? src : `./${src}`;
     }
+
+    // Zabezpiecza podpisy przed wstrzyknięciem HTML
     function escapeHtml(s){
-      return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+      return String(s)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#39;');
     }
+
+    // Aktualizacja paska postępu
     function setProgress(){
       const pct = state.pairs.length ? (state.i / state.pairs.length) * 100 : 0;
       barEl.style.width = pct + '%';
     }
+
+    // Preload obrazka – przyspiesza wyświetlenie i umożliwia komunikat o błędzie
     function preload(src){
       return new Promise((resolve)=>{
         const img = new Image();
@@ -77,19 +165,24 @@
       });
     }
 
+    // Przekształca Twój JSON na prostą strukturę do renderu
     function normalizePairs(json){
       const arr = Array.isArray(json?.pairs) ? json.pairs : [];
       return arr.map(item => {
         const L = item?.left ?? {}; const R = item?.right ?? {};
-        const left = { label: L.title, src: withImgPrefix(L.img) };
+        const left  = { label: L.title, src: withImgPrefix(L.img) };
         const right = { label: R.title, src: withImgPrefix(R.img) };
         return { left, right };
       }).filter(p => p.left.src && p.right.src);
     }
 
+    // ==========================================
+    // START – wczytanie danych i pierwsza para
+    // ==========================================
+
     async function boot(){
       try{
-        const res = await fetch(PATH_JSON, { cache: 'no-store' });
+        const res = await fetch(PATH_JSON, { cache: 'no-store' }); // bez cache – wygodniejsze przy aktualizacjach
         if(!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
         state.pairs = normalizePairs(json);
@@ -100,30 +193,49 @@
       }
     }
 
-    async function renderPair(){
-      gameEl.innerHTML = '';
+    // ==========================================
+    // RENDEROWANIE AKTUALNEJ PARY
+    // ==========================================
+
+    async function rendeasync function renderPair(){
+      // zablokuj wejście na czas przygotowania pary
+      state.locked = true;TML = '';
       setProgress();
+
+      // Jeśli doszliśmy do końca – pokaż podsumowanie
       if(state.i >= state.pairs.length){
         return showSummary();
       }
+
       const pair = state.pairs[state.i];
-      const [pl, pr] = await Promise.all([preload(pair.left.src), preload(pair.right.src)]);
-      const leftCard = createCard(pair.left, 'left', pl.ok);
+
+      // Równoległy preload obu obrazów tej pary
+      const [pl, pr] = await Promise.all([
+        preload(pair.left.src),
+        preload(pair.right.src)
+      ]);
+
+      // Zbuduj karty i wstaw do DOM
+      const leftCard  = createCard(pair.left,  'left',  pl.ok);
       const rightCard = createCard(pair.right, 'right', pr.ok);
       gameEl.appendChild(leftCard);
-      gameEl.appendChild(rightCard);
-    }
+      gameEl.appendChild(rgameEl.appendChild(rightCard);
 
+      // odblokuj po zrenderowaniu kart
+      state.locked = false;y pojedynczą kartę (obraz + podpis + przycisk)
     function createCard(item, side, ok){
       const card = document.createElement('article');
       card.className = `card ${side}`;
 
+      // Obraz
       const media = document.createElement('div');
       media.className = 'media';
       const img = document.createElement('img');
       img.alt = item.label || '';
       img.src = item.src;
       media.appendChild(img);
+
+      // Komunikat o błędzie wczytania (opcjonalny)
       if(!ok){
         const err = document.createElement('div');
         err.className = 'err';
@@ -131,30 +243,43 @@
         media.appendChild(err);
       }
 
+      // Podpis pod obrazem
       const label = document.createElement('div');
       label.className = 'label';
-      label.innerHTML = `<span class="pill">${side==='left'?'lewa':'prawa'}</span> <b>${escapeHtml(item.label)}</b>`;
+      label.innerHTML = `<b>${escapeHtml(item.label)}</b>`;
 
+      // Przycisk SMASH
       const btn = document.createElement('button');
       btn.className = 'pick';
       btn.textContent = 'Smash';
       btn.addEventListener('click', ()=> choose(side));
 
-      card.append(media,label,btn);
+      card.append(media, label, btn);
       return card;
     }
 
-    function choose(side){
-      const cards = document.querySelectorAll('.card');
-      const pair = state.pairs[state.i];
-      const pick = side==='left' ? pair.left : pair.right;
-      const reject = side==='left' ? pair.right : pair.left;
-      const chosenCard = side==='left' ? cards[0] : cards[1];
-      const rejectedCard = side==='left' ? cards[1] : cards[0];
+    // ==========================================
+    // LOGIKA WYBORU – animacja + zapis wyniku
+    // ==========================================
 
+    function choose(sidefunction choose(side){
+      // blokada wielokrotnych wyborów w trakcie animacji
+      if(state.locked) return;
+      state.locked = true;ie karty z DOM (kolejność: lewa = [0], prawa = [1])
+      const cards = document.querySelectorAll('.card');
+      const chosenCard  = side==='left' ? cards[0] : cards[1];
+      const rejectedCard= side==='left' ? cards[1] : cards[0];
+
+      // Dane wybranej/odrzuconej opcji
+      const pair = state.pairs[state.i];
+      const pick   = side==='left' ? pair.left  : pair.right;
+      const reject = side==='left' ? pair.right : pair.left;
+
+      // Efekty wizualne (CSS): wybrana zostaje, odrzucona zanika
       chosenCard.classList.add('stay');
       rejectedCard.classList.add('fade-out');
 
+      // Po 2 sekundach przechodzimy do kolejnej pary
       setTimeout(()=>{
         state.chosen.push(pick);
         state.rejected.push(reject);
@@ -163,24 +288,37 @@
       },2000);
     }
 
+    // ==========================================
+    // PODSUMOWANIE – miniatury wszystkich wyborów
+    // ==========================================
+
     function renderGrid(items){
-      return `<div class="grid">${items.map(it=>`<div class='tile'><img src='${it.src}' alt='${escapeHtml(it.label)}'/><div class='cap'>${escapeHtml(it.label)}</div></div>`).join('')}</div>`;
+      return `<div class="grid">${items.map(it=>`
+        <div class='tile'>
+          <img src='${it.src}' alt='${escapeHtml(it.label)}'/>
+          <div class='cap'>${escapeHtml(it.label)}</div>
+        </div>`).join('')}</div>`;
     }
 
     function showSummary(){
       document.getElementById('game').classList.add('hidden');
       summaryEl.classList.remove('hidden');
-      const chosenGrid = renderGrid(state.chosen);
-      const rejectedGrid = renderGrid(state.rejected);
+      const chosenGrid  = renderGrid(state.chosen);
+      const rejectedGrid= renderGrid(state.rejected);
       summaryEl.innerHTML = `<h2>Podsumowanie</h2><div class='lists'><div><h3>Wybrane (${state.chosen.length})</h3>${chosenGrid}</div><div><h3>Odrzucone (${state.rejected.length})</h3>${rejectedGrid}</div></div>`;
     }
 
-    addEventListener('keydown', (e)=>{
-      if(summaryEl && !summaryEl.classList.contains('hidden')) return;
+    // ==========================================
+    // STEROWANIE KLAWIATURĄ (opcjonalnie)
+    // A/← wybiera lewą, D/→ wybiera prawą – bez wyświetlania instrukcji na UI
+    // ==========================================
+    addEventListener('keaddEventListener('keydown', (e)=>{
+      if(state.locked) return;&& !summaryEl.classList.contains('hidden')) return; // nie działa na ekranie podsumowania
       if(e.key==='ArrowLeft' || e.key==='a' || e.key==='A') choose('left');
       if(e.key==='ArrowRight'|| e.key==='d' || e.key==='D') choose('right');
     });
 
+    // Start po załadowaniu DOM
     document.addEventListener('DOMContentLoaded', boot);
   </script>
 </body>
