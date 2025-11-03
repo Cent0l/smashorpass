@@ -1,13 +1,96 @@
 {
   "pairs": [
     {
-      "left":  { "id": "a", "title": "mazda mx5 miata", "img": "img/1.png" },
-      "right": { "id": "b", "title": "optimus prime",     "img": "img/2.png" }
+      "left":  { "id": "1",  "title": "MAZDA MX-5 MIATA",                         "img": "img/1.png" },
+      "right": { "id": "2",  "title": "OPTIMUS PRIME (TRANSFORMERS)",             "img": "img/2.png" }
     },
     {
-      "left":  { "id": "c", "title": "Siimone-Alvin i wiewórki 3",  "img": "img/3.png"  },
-      "right": { "id": "d", "title": "The Thing z The Thing","img": "img/4.png"  }
+      "left":  { "id": "3",  "title": "SIIIMONE (ALVIN I WIEWIÓRKI 3)",           "img": "img/3.png" },
+      "right": { "id": "4",  "title": "THE THING (THE THING)",                    "img": "img/4.png" }
+    },
+    {
+      "left":  { "id": "5",  "title": "MYCONID KING (BALDURS GATE 3)",            "img": "img/5.png" },
+      "right": { "id": "6",  "title": "KRYSIA (REKLAMY TESCO)",                   "img": "img/6.png" }
+    },
+    {
+      "left":  { "id": "7",  "title": "SYMBOL OMEGA",                             "img": "img/7.png" },
+      "right": { "id": "8",  "title": "JOHN DOE (ROBLOX)",                        "img": "img/8.png" }
+    },
+    {
+      "left":  { "id": "9",  "title": "COUNT ORLOK (NOSFERATU 2024)",             "img": "img/9.png" },
+      "right": { "id": "10", "title": "COUNT ORLOK (NOSFERATU 1922)",             "img": "img/10.png" }
+    },
+    {
+      "left":  { "id": "11", "title": "MARCIN DUBIEL (POKEMON GO! NIEZBĘDNIK GRACZA, AUTORSTWA: MARCIN DUBIEL)", "img": "img/11.png" },
+      "right": { "id": "12", "title": "MYSZKA LOGITECH G3000",                    "img": "img/12.png" }
+    },
+    {
+      "left":  { "id": "13", "title": "XENOMORPH (ALIEN)",                        "img": "img/13.png" },
+      "right": { "id": "14", "title": "HANNAH (UNTIL DAWN)",                      "img": "img/14.png" }
+    },
+    {
+      "left":  { "id": "15", "title": "FACEHUGGER (ALIEN)",                       "img": "img/15.png" },
+      "right": { "id": "16", "title": "OBCA FORMA ŻYCIA (ANIHILIACJA)",          "img": "img/16.png" }
+    },
+    {
+      "left":  { "id": "17", "title": "PENNYWISE (IT 2017)",                      "img": "img/17.png" },
+      "right": { "id": "18", "title": "RONALD MCDONALD",                          "img": "img/18.png" }
+    },
+    {
+      "left":  { "id": "19", "title": "EDWARD (ZMIERZCH)",                        "img": "img/19.png" },
+      "right": { "id": "20", "title": "CHARLIE (ZMIERZCH)",                       "img": "img/20.png" }
+    },
+    {
+      "left":  { "id": "21", "title": "EBRIETAS, CÓRKA KOSMOSU (BLOODBORNE)",     "img": "img/21.png" },
+      "right": { "id": "22", "title": "LOLLYPOLLY (LEAGUE OF LEGENDS)",           "img": "img/22.png" }
+    },
+    {
+      "left":  { "id": "23", "title": "PAT (SĄSIEDZI)",                           "img": "img/23.png" },
+      "right": { "id": "24", "title": "MAT (SĄSIEDZI)",                           "img": "img/24.png" }
+    },
+    {
+      "left":  { "id": "25", "title": "CRASH BANDICOOT (CRASH BANDICOOT)",        "img": "img/25.png" },
+      "right": { "id": "26", "title": "MASTER CHIEF (HALO)",                      "img": "img/26.png" }
+    },
+    {
+      "left":  { "id": "27", "title": "MGŁAWICA KRABA",                           "img": "img/27.png" },
+      "right": { "id": "28", "title": "MGŁAWICA KLEPSYDRY",                       "img": "img/28.png" }
+    },
+    {
+      "left":  { "id": "29", "title": "ICE SPICE",                                "img": "img/29.png" },
+      "right": { "id": "30", "title": "SŁAWOMIR MENTZEN (BEZ CYCÓW)",             "img": "img/30.png" }
+    },
+    {
+      "left":  { "id": "31", "title": "OGNISTY GROSZKOSTRZELEC (PLANTS VS ZOMBIES)", "img": "img/31.png" },
+      "right": { "id": "32", "title": "ZLODZONY GROSZKOSTRZELEC (PLANTS VS ZOMBIES)", "img": "img/32.png" }
+    },
+    {
+      "left":  { "id": "33", "title": "SZÓKAM RZONY GOSTEK",                      "img": "img/33.png" },
+      "right": { "id": "34", "title": "KUCHNIA POLSKA",                           "img": "img/34.png" }
+    },
+    {
+      "left":  { "id": "35", "title": "DEMOGORGON (STRANGER THINGS)",             "img": "img/35.png" },
+      "right": { "id": "36", "title": "ANIOŁ (BIBLIJNY)",                         "img": "img/36.png" }
+    },
+    {
+      "left":  { "id": "37", "title": "TWR",                                      "img": "img/37.png" },
+      "right": { "id": "38", "title": "SOWA",                                     "img": "img/38.png" }
+    },
+    {
+      "left":  { "id": "39", "title": "RZECZY POUKŁADANE W SATYSFAKCJONUJĄCY SPOSÓB", "img": "img/39.png" },
+      "right": { "id": "40", "title": "SENSORYCZNIE PRZYJEMNY PLUSZAK",           "img": "img/40.png" }
+    },
+    {
+      "left":  { "id": "41", "title": "MENEL (DETEKTYW Z DISCO ELYSIUM)",         "img": "img/41.png" },
+      "right": { "id": "42", "title": "PINGLARZ (KIM KITSURAGI Z DISCO ELYSIUM)", "img": "img/42.png" }
+    },
+    {
+      "left":  { "id": "43", "title": "KAPITALISTYCZNA BABA KRZYWA (DISCO ELYSIUM)", "img": "img/43.png" },
+      "right": { "id": "44", "title": "KOMUNISTYCZNY PIERD GRUBY (DISCO ELYSIUM)",   "img": "img/44.png" }
+    },
+    {
+      "left":  { "id": "45", "title": "VAPOREON (POKEMON)",                       "img": "img/45.png" },
+      "right": { "id": "46", "title": "TYPHLOSION (POKEMON)",                     "img": "img/46.png" }
     }
-  
   ]
 }
