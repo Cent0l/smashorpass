@@ -129,7 +129,7 @@
       "right": { "id": "64", "title": "TUREK Z TUREK ZERUJE", "img": "img/64.png" }
     },
     {
-      "left":  { "id": "65", "title": "CHLEBEK GLAMOUR", "img": "img/65.png" },
+      "left":  { "id": "65", "title": "CHLEBAK GLAMOUR", "img": "img/65.png" },
       "right": { "id": "66", "title": "DONICZKA GLAMOUR", "img": "img/66.png" }
     },
     {
@@ -140,8 +140,5 @@
       "left":  { "id": "69", "title": "LODY OWOCOWE NA BAZIE MLEKA", "img": "img/69.png" },
       "right": { "id": "70", "title": "SORBETY", "img": "img/70.png" }
     }
-  ]
-}
-
   ]
 }
