@@ -91,6 +91,57 @@
     {
       "left":  { "id": "45", "title": "VAPOREON (POKEMON)",                       "img": "img/45.png" },
       "right": { "id": "46", "title": "TYPHLOSION (POKEMON)",                     "img": "img/46.png" }
+    },
+    {
+      "left":  { "id": "47", "title": "BAMBI", "img": "img/47.png" },
+      "right": { "id": "48", "title": "OG BAMBI", "img": "img/48.png" }
+    },
+    {
+      "left":  { "id": "49", "title": "DAMIEN SALVATORE", "img": "img/49.png" },
+      "right": { "id": "50", "title": "STEFAN SALVATORE", "img": "img/50.png" }
+    },
+    {
+      "left":  { "id": "51", "title": "JACOB", "img": "img/51.png" },
+      "right": { "id": "52", "title": "EDWARD", "img": "img/52.png" }
+    },
+    {
+      "left":  { "id": "53", "title": "ŁYŻKA", "img": "img/53.png" },
+      "right": { "id": "54", "title": "WIDELEC", "img": "img/54.png" }
+    },
+    {
+      "left":  { "id": "55", "title": "MORZE", "img": "img/55.png" },
+      "right": { "id": "56", "title": "GÓRY", "img": "img/56.png" }
+    },
+    {
+      "left":  { "id": "57", "title": "BUTELKA", "img": "img/57.png" },
+      "right": { "id": "58", "title": "PUSZKA", "img": "img/58.png" }
+    },
+    {
+      "left":  { "id": "59", "title": "ANANASIK", "img": "img/59.png" },
+      "right": { "id": "60", "title": "BIGOSIK", "img": "img/60.png" }
+    },
+    {
+      "left":  { "id": "61", "title": "BIMBALONY LASUCZITY", "img": "img/61.png" },
+      "right": { "id": "62", "title": "BIG KLAMOTY SANDY S", "img": "img/62.png" }
+    },
+    {
+      "left":  { "id": "63", "title": "MICHAŁ WRZOSEK Z KANAŁU MICHAŁ WRZOSEK", "img": "img/63.png" },
+      "right": { "id": "64", "title": "TUREK Z TUREK ZERUJE", "img": "img/64.png" }
+    },
+    {
+      "left":  { "id": "65", "title": "CHLEBEK GLAMOUR", "img": "img/65.png" },
+      "right": { "id": "66", "title": "DONICZKA GLAMOUR", "img": "img/66.png" }
+    },
+    {
+      "left":  { "id": "67", "title": "KOSZULKA W PIONOWE PASKI", "img": "img/67.png" },
+      "right": { "id": "68", "title": "KOSZULKA W POZIOME PASKI", "img": "img/68.png" }
+    },
+    {
+      "left":  { "id": "69", "title": "LODY OWOCOWE NA BAZIE MLEKA", "img": "img/69.png" },
+      "right": { "id": "70", "title": "SORBETY", "img": "img/70.png" }
     }
+  ]
+}
+
   ]
 }
